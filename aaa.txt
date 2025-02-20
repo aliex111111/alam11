@@ -1,0 +1,25 @@
+const express = require('express');
+const app = express();
+const net = require('net');
+
+const PORT = 8080;
+const clientSocket = new net.Socket();
+
+app.get('/command/:cmd', (req, res) => {
+    const command = req.params.cmd;
+    clientSocket.connect(PORT, 'device-ip', () => {
+        clientSocket.write(command);
+    });
+
+    clientSocket.on('data', (data) => {
+        res.send(`Response: ${data}`);
+    });
+
+    clientSocket.on('error', (err) => {
+        res.send(`Error: ${err.message}`);
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
